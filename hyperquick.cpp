@@ -117,7 +117,7 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
          	buffer[0]=myList[listsize/2];
          	
          	//Broadcast pivot to all processors in range
-         	for (int j = startprocessor+1; j < endprocessor; j++)
+         	for (int j = startprocessor+1; j <= endprocessor; j++)
 				MPI_Send(buffer, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
 		}
 		else
@@ -133,8 +133,8 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 		if (rank >= midprocessor)
 		{
 			partner = rank - pdistance;
-			if (partner < size)
-				partner = size-1;
+			if (partner < 0)
+				partner = endprocessor;
 			
 			//int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
              
@@ -160,8 +160,8 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 		{
 		   //Wrong
 			partner = rank + pdistance;
-			if (partner >= size)
-				partner = 0;
+			if (partner > size)
+				partner = startprocessor;
 			
 			//int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
              
@@ -279,6 +279,3 @@ int main (int argc, char *argv[])
 	MPI_Finalize();
 	return 0;
 }
-
-
-
