@@ -1,0 +1,2 @@
+module load openmpi/intel/1.4.2
+mpicc hyperquick.cpp -o quick
