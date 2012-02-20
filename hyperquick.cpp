@@ -51,6 +51,7 @@ void Merge (int *myList, int *list1, int *list2, int length1, int length2)
 	int j = 0;
 	int k = 0;
 
+	myList = new int[length1+length2];
    
 	while (i != length1 && j != length2)
 	{
@@ -232,12 +233,13 @@ void HyperQuicksort(int listsize)
 	if (rank == 0)
 	{		
 		//Broadcast listsize to all processors
-		MPI_Send(listsize, 10, MPI_INT, 0, 0, MPI_COMM_WORLD);
+		for (int i = 0; i <= size; i++)
+			MPI_Send(listsize, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
 	}
 	else
 	{
 		//Recieve listsize from lead processor
-		MPI_Recv(listsize, 10, MPI_INT, i, 0, MPI_COMM_WORLD, &status);
+		MPI_Recv(listsize, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
 	}
 	*/
 	
@@ -252,7 +254,6 @@ void HyperQuicksort(int listsize)
 	{
 	   myList[i]=rand()%1000 * (rank + 1);
 	}
-
 	
 	int pivot = listsize/size^2;
 	quick_sort(myList, pivot);
