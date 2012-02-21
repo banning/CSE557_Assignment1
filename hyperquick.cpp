@@ -101,63 +101,63 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 
 	if (pdistance >= 1)
 	{
-	   cout<<"Processor " << rank << " has the following list of length " <<listsize <<endl;
-	   for (int i = 0; i < listsize; i++)
-	   {
-	     cout<<myList[i]<<'\t';
-	   }
-	   cout<<endl;
+	   // cout<<"Processor " << rank << " has the following list of length " <<listsize <<endl;
+	   // for (int i = 0; i < listsize; i++)
+	   // {
+	   //   cout<<myList[i]<<'\t';
+	   // }
+	   // cout<<endl;
 	      
-	// Calculate and broadcast pivot
-	if (rank == startprocessor)
-	{
-		//pivot = MEDIAN of list
-	    buffer[0]=myList[listsize/2];
-	         
-	    //Broadcast pivot to all processors in range
-	    for (int j = startprocessor+1; j <= endprocessor; j++)
-			MPI_Send(buffer, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
-	}
-	else
-	{
-		//Recieve listsize from start processor
-		MPI_Recv(buffer, 1, MPI_INT, startprocessor, 0, MPI_COMM_WORLD, &status);
-	}
+		// Calculate and broadcast pivot
+		if (rank == startprocessor)
+		{
+			//pivot = MEDIAN of list
+		    buffer[0]=myList[listsize/2];
+		         
+		    //Broadcast pivot to all processors in range
+		    for (int j = startprocessor+1; j <= endprocessor; j++)
+				MPI_Send(buffer, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
+		}
+		else
+		{
+			//Recieve listsize from start processor
+			MPI_Recv(buffer, 1, MPI_INT, startprocessor, 0, MPI_COMM_WORLD, &status);
+		}
 
-	Split (myList, buffer[0], leftList, rightList, listsize, leftLength, rightLength);
+		Split (myList, buffer[0], leftList, rightList, listsize, leftLength, rightLength);
 
-	if (rank >= midprocessor)
-	{
-		partner = rank - pdistance;
-		if (partner < 0)
-			partner = endprocessor;
+		if (rank >= midprocessor)
+		{
+			partner = rank - pdistance;
+			if (partner < 0)
+				partner = endprocessor;
 
-		//int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
-	             
-	    // Send length of leftList
-	    buffer[0]=leftLength;
-		MPI_Send(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD);
+			//int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+		             
+		    // Send length of leftList
+		    buffer[0]=leftLength;
+			MPI_Send(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD);
 
-		// Send leftList
-		MPI_Send(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD);
+			// Send leftList
+			MPI_Send(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD);
 
-		//int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)
+			//int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)
 
-		// Receive length of leftList
-		MPI_Recv(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
-		  leftLength=buffer[0];
+			// Receive length of leftList
+			MPI_Recv(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
+			  leftLength=buffer[0];
 
-		// Receive leftList
-		MPI_Recv(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
-		myList = new int[rightLength+leftLength];
-		Merge (myList, leftList, rightList, leftLength, rightLength);
-		pqsort2(midprocessor, endprocessor, myList, leftLength+rightLength);
-	}
-	else
-	{
+			// Receive leftList
+			MPI_Recv(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
+			myList = new int[rightLength+leftLength];
+			Merge (myList, leftList, rightList, leftLength, rightLength);
+			pqsort2(midprocessor, endprocessor, myList, leftLength+rightLength);
+		}
+		else
+		{
 		partner = rank + pdistance;
 		if (partner > size)
-		partner = startprocessor;
+			partner = startprocessor;
 
 		//int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
 		             
@@ -181,15 +181,15 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 		pqsort2(startprocessor, midprocessor-1, myList, leftLength+rightLength);
 		}
 	}
-	else
-	{
-		cout<<" In the end, Processor " << rank << " has the following list"<<endl;
-		for (int i = 0; i < listsize; i++)
-		{
-			cout<<myList[i]<<'\t';
-		}
-		cout<<endl;
-	}
+	// else
+	// {
+	// 	cout<<" In the end, Processor " << rank << " has the following list"<<endl;
+	// 	for (int i = 0; i < listsize; i++)
+	// 	{
+	// 		cout<<myList[i]<<'\t';
+	// 	}
+	// 	cout<<endl;
+	// }
 
 }
 
