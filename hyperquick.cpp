@@ -129,6 +129,8 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 		
 		Split (myList, buffer[0], leftList, rightList, listsize, leftLength, rightLength);
 		
+		cout<< "Processor " << rank << " pivot " << pivot <<endl;
+
 		if (rank >= midprocessor)
 		{
 			partner = rank - pdistance;
@@ -138,19 +140,21 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 			//int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
              
             // Send length of leftList 
-        	 buffer[0]=leftLength;
+        	buffer[0]=leftLength;
 			MPI_Send(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD);
 			// Send leftList
 			MPI_Send(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD);
 			
 			//int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)
 			
-			// Receive length of rightList
-
+			// Receive length of leftList
 			MPI_Recv(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
  			leftLength=buffer[0];
-			// Receive rightList
-			MPI_Recv(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
+
+			// Receive leftList
+			int buffer[leftLength];
+			MPI_Recv(buffer, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
+			leftList = buffer;
 			
 			Merge (myList, leftList, rightList, leftLength, rightLength);
 			pqsort2(midprocessor, endprocessor, myList, leftLength+rightLength);
@@ -171,13 +175,15 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 			
 			//int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)
 			
-			// Receive length of leftList
-			
+			// Receive length of rightList
 			MPI_Recv(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
          	rightLength=buffer[0];
-			// Receive leftList
-			MPI_Recv(rightList, rightLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
-			
+
+			// Receive rightList
+			int buffer[rightLength];
+			MPI_Recv(buffer, rightLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
+			rightList = buffer;
+
 			Merge (myList, leftList, rightList, leftLength, rightLength);
 			pqsort2(startprocessor, midprocessor-1, myList, leftLength+rightLength);
 		}
