@@ -104,12 +104,12 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 	
 	if (pdistance >= 1)
 	{
-	   cout<<"Processor " << rank << " has the following list of length " <<listsize <<endl;
-	   for (int i = 0; i < listsize; i++)
-      {
-         cout<<myList[i]<<'\t';
-      }
-      cout<<endl;
+	   // cout<<"Processor " << rank << " has the following list of length " <<listsize <<endl;
+	   // for (int i = 0; i < listsize; i++)
+    //   {
+    //      cout<<myList[i]<<'\t';
+    //   }
+    //   cout<<endl;
       
 		// Calculate and broadcast pivot
 		if (rank == startprocessor)
@@ -148,9 +148,9 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 			// Receive length of rightList
 
 			MPI_Recv(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
- 			rightLength=buffer[0];        
+ 			leftLength=buffer[0];
 			// Receive rightList
-			MPI_Recv(rightList, rightLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
+			MPI_Recv(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
 			
 			Merge (myList, leftList, rightList, leftLength, rightLength);
 			pqsort2(midprocessor, endprocessor, myList, leftLength+rightLength);
@@ -174,9 +174,9 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 			// Receive length of leftList
 			
 			MPI_Recv(buffer, 1, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
-         	leftLength=buffer[0];
+         	rightLength=buffer[0];
 			// Receive leftList
-			MPI_Recv(leftList, leftLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
+			MPI_Recv(rightList, rightLength, MPI_INT, partner, 0, MPI_COMM_WORLD, &status);
 			
 			Merge (myList, leftList, rightList, leftLength, rightLength);
 			pqsort2(startprocessor, midprocessor-1, myList, leftLength+rightLength);
@@ -184,12 +184,12 @@ void pqsort2 (int startprocessor, int endprocessor, int* myList, int listsize)
 	}
 	else
 	{
-	   cout<<" In the end, Processor " << rank << "has the following list"<<endl;
-	   for (int i = 0; i < listsize; i++)
-      {
-         cout<<myList[i]<<'\t';
-      }
-      cout<<endl;
+	   	cout<<" In the end, Processor " << rank << " has the following list"<<endl;
+		for (int i = 0; i < listsize; i++)
+		{
+			cout<<myList[i]<<'\t';
+		}
+		cout<<endl;
 	} 
 
 }
